@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/WorkshopRegistrationApp/static/css/main.f1f338f7.css",
+    "main.js": "/WorkshopRegistrationApp/static/js/main.5848c6cf.js",
+    "static/js/453.efe8359d.chunk.js": "/WorkshopRegistrationApp/static/js/453.efe8359d.chunk.js",
+    "index.html": "/WorkshopRegistrationApp/index.html",
+    "main.f1f338f7.css.map": "/WorkshopRegistrationApp/static/css/main.f1f338f7.css.map",
+    "main.5848c6cf.js.map": "/WorkshopRegistrationApp/static/js/main.5848c6cf.js.map",
+    "453.efe8359d.chunk.js.map": "/WorkshopRegistrationApp/static/js/453.efe8359d.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.f1f338f7.css",
+    "static/js/main.5848c6cf.js"
+  ]
+}
