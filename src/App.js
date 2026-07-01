@@ -2,127 +2,159 @@ import React, { useState } from "react";
 import "./App.css";
 
 function App() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    workshop: "",
-  });
+  const [assignments, setAssignments] = useState([]);
+  const [title, setTitle] = useState("");
+  const [subject, setSubject] = useState("");
+  const [dueDate, setDueDate] = useState("");
+  const [status, setStatus] = useState("Pending");
+  const [filterSubject, setFilterSubject] = useState("All");
 
-  const [participants, setParticipants] = useState([]);
-  const [message, setMessage] = useState("");
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const exists = participants.some(
-      (participant) => participant.email === formData.email
-    );
-
-    if (exists) {
-      setMessage("⚠ Participant already registered!");
+  const addAssignment = () => {
+    if (title === "" || subject === "" || dueDate === "") {
+      alert("Please fill all fields");
       return;
     }
 
-    setParticipants([
-      ...participants,
-      {
-        id: Date.now(),
-        ...formData,
-      },
-    ]);
+    const newAssignment = {
+      id: Date.now(),
+      title,
+      subject,
+      dueDate,
+      status,
+    };
 
-    setMessage("✅ Registration Confirmed Successfully!");
+    setAssignments([...assignments, newAssignment]);
 
-    setFormData({
-      name: "",
-      email: "",
-      workshop: "",
-    });
+    setTitle("");
+    setSubject("");
+    setDueDate("");
+    setStatus("Pending");
   };
+
+  const updateStatus = (id, newStatus) => {
+    setAssignments(
+      assignments.map((item) =>
+        item.id === id ? { ...item, status: newStatus } : item,
+      ),
+    );
+  };
+
+  const filteredAssignments =
+    filterSubject === "All"
+      ? assignments
+      : assignments.filter((item) => item.subject === filterSubject);
+
+  const submittedCount = assignments.filter(
+    (a) => a.status === "Submitted",
+  ).length;
+  const pendingCount = assignments.filter((a) => a.status === "Pending").length;
+  const lateCount = assignments.filter((a) => a.status === "Late").length;
+
+  const subjects = ["All", ...new Set(assignments.map((a) => a.subject))];
 
   return (
     <div className="container">
+      <h1>College Assignment Submission Tracker</h1>
 
-      <div className="header">
-        <h1>Workshop Registration Portal</h1>
-        <p>Register & Confirm Your Participation</p>
-      </div>
-
-      <div className="stats-card">
-        <h2>{participants.length}</h2>
-        <p>Total Participants</p>
-      </div>
-
-      <form className="form-card" onSubmit={handleSubmit}>
+      <div className="form">
         <input
           type="text"
-          name="name"
-          placeholder="Full Name"
-          value={formData.name}
-          onChange={handleChange}
-          required
+          placeholder="Assignment Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
         />
 
         <input
-          type="email"
-          name="email"
-          placeholder="Email Address"
-          value={formData.email}
-          onChange={handleChange}
-          required
+          type="text"
+          placeholder="Subject"
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
         />
 
-        <select
-          name="workshop"
-          value={formData.workshop}
-          onChange={handleChange}
-          required
-        >
-          <option value="">Select Workshop</option>
-          <option>React JS</option>
-          <option>Python</option>
-          <option>UI/UX Design</option>
-          <option>Data Science</option>
+        <input
+          type="date"
+          value={dueDate}
+          onChange={(e) => setDueDate(e.target.value)}
+        />
+
+        <select value={status} onChange={(e) => setStatus(e.target.value)}>
+          <option>Pending</option>
+          <option>Submitted</option>
+          <option>Late</option>
         </select>
 
-        <button type="submit">
-          Register Now
-        </button>
-      </form>
-
-      {message && <div className="message">{message}</div>}
-
-      <div className="table-card">
-        <h2>Registered Participants</h2>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Workshop</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {participants.map((participant) => (
-              <tr key={participant.id}>
-                <td>{participant.name}</td>
-                <td>{participant.email}</td>
-                <td>{participant.workshop}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <button onClick={addAssignment}>Add Assignment</button>
       </div>
 
+      <div className="dashboard">
+        <div className="card">
+          <h3>Submitted</h3>
+          <p>{submittedCount}</p>
+        </div>
+
+        <div className="card">
+          <h3>Pending</h3>
+          <p>{pendingCount}</p>
+        </div>
+
+        <div className="card">
+          <h3>Late</h3>
+          <p>{lateCount}</p>
+        </div>
+      </div>
+
+      <div className="filter">
+        <label>Filter by Subject:</label>
+
+        <select
+          value={filterSubject}
+          onChange={(e) => setFilterSubject(e.target.value)}
+        >
+          {subjects.map((sub, index) => (
+            <option key={index}>{sub}</option>
+          ))}
+        </select>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Subject</th>
+            <th>Due Date</th>
+            <th>Status</th>
+            <th>Change Status</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {filteredAssignments.map((item) => (
+            <tr key={item.id}>
+              <td>{item.title}</td>
+              <td>{item.subject}</td>
+              <td>{item.dueDate}</td>
+              <td>{item.status}</td>
+
+              <td>
+                <select
+                  value={item.status}
+                  onChange={(e) => updateStatus(item.id, e.target.value)}
+                >
+                  <option>Pending</option>
+                  <option>Submitted</option>
+                  <option>Late</option>
+                </select>
+              </td>
+            </tr>
+          ))}
+
+          {filteredAssignments.length === 0 && (
+            <tr>
+              <td colSpan="5">No Assignments Found</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 }
